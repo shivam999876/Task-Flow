@@ -74,6 +74,7 @@ Create a `.env` file in the `backend/` directory using the provided `.env.exampl
 PORT=5000
 NODE_ENV=development
 MONGO_URI=mongodb+srv://<username>:<password>@cluster.mongodb.net/?retryWrites=true&w=majority
+# Railway and some cloud providers may use MONGODB_URI instead of MONGO_URI
 JWT_SECRET=your_super_secret_jwt_key_here
 JWT_REFRESH_SECRET=your_super_secret_refresh_key_here
 JWT_EXPIRES_IN=15m
@@ -120,7 +121,7 @@ This application is ready to be deployed on Railway.
 
 1. Connect your GitHub repository to Railway.
 2. Create a new service from the repo and set the Root Directory to `backend/`.
-3. Under Variables, add all variables from your `.env` file (e.g., `MONGO_URI`, `JWT_SECRET`, `CLIENT_URL` pointing to your deployed frontend domain).
+3. Under Variables, add all variables from your `.env` file (e.g., `MONGO_URI` or `MONGODB_URI`, `JWT_SECRET`, `CLIENT_URL` pointing to your deployed frontend domain).
 4. Railway will automatically detect `package.json` and start the server using `npm start`.
 
 ### Frontend Deployment
