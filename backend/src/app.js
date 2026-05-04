@@ -14,24 +14,44 @@ const errorHandler = require('./middleware/errorHandler');
 
 const app = express();
 
+// ─── Allowed Origins (IMPORTANT) ────────────────────────────────────────────
+const allowedOrigins = [
+  "https://alluring-amazement-production-b66f.up.railway.app",
+  "https://taskflowmanager11.netlify.app",
+  "http://localhost:5173"
+];
+
 // ─── Security Middleware ────────────────────────────────────────────────────
 app.use(helmet());
-app.use(
-  cors({
-    origin: process.env.CLIENT_URL || 'http://localhost:5173',
-    credentials: true, // allow cookies (refresh token)
-  })
-);
+
+app.use(cors({
+  origin: function (origin, callback) {
+    // allow requests with no origin (Postman, mobile apps)
+    if (!origin) return callback(null, true);
+
+    if (allowedOrigins.includes(origin)) {
+      callback(null, true);
+    } else {
+      callback(new Error("Not allowed by CORS"));
+    }
+  },
+  credentials: true,
+  methods: ["GET", "POST", "PUT", "DELETE", "OPTIONS"],
+  allowedHeaders: ["Content-Type", "Authorization"]
+}));
+
+// 🔥 Handle preflight requests (VERY IMPORTANT)
+app.options("*", cors());
 
 // ─── Rate Limiting ──────────────────────────────────────────────────────────
 const limiter = rateLimit({
-  windowMs: 15 * 60 * 1000, // 15 minutes
+  windowMs: 15 * 60 * 1000,
   max: 100,
   message: { success: false, message: 'Too many requests. Please try again later.' },
 });
 app.use('/api/', limiter);
 
-// Auth endpoints get stricter rate limiting
+// Auth endpoints stricter
 const authLimiter = rateLimit({
   windowMs: 15 * 60 * 1000,
   max: 20,
