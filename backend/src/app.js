@@ -14,7 +14,7 @@ const errorHandler = require('./middleware/errorHandler');
 
 const app = express();
 
-// ─── Allowed Origins (IMPORTANT) ────────────────────────────────────────────
+// ─── Allowed Origins ────────────────────────────────────────────────────────
 const allowedOrigins = [
   "https://alluring-amazement-production-b66f.up.railway.app",
   "https://taskflowmanager11.netlify.app",
@@ -26,13 +26,12 @@ app.use(helmet());
 
 app.use(cors({
   origin: function (origin, callback) {
-    // allow requests with no origin (Postman, mobile apps)
     if (!origin) return callback(null, true);
 
     if (allowedOrigins.includes(origin)) {
       callback(null, true);
     } else {
-      callback(new Error("Not allowed by CORS"));
+      callback(null, false); // ✅ FIXED
     }
   },
   credentials: true,
@@ -40,8 +39,11 @@ app.use(cors({
   allowedHeaders: ["Content-Type", "Authorization"]
 }));
 
-// 🔥 Handle preflight requests (VERY IMPORTANT)
-app.options("*", cors());
+// ✅ FIXED preflight handling
+app.options("*", cors({
+  origin: allowedOrigins,
+  credentials: true
+}));
 
 // ─── Rate Limiting ──────────────────────────────────────────────────────────
 const limiter = rateLimit({
@@ -51,7 +53,6 @@ const limiter = rateLimit({
 });
 app.use('/api/', limiter);
 
-// Auth endpoints stricter
 const authLimiter = rateLimit({
   windowMs: 15 * 60 * 1000,
   max: 20,
