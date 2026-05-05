@@ -113,22 +113,70 @@ Navigate to `http://localhost:5173` in your browser.
 
 ---
 
-## 🚀 Deployment (Railway)
+## 🚀 Deployment (Render)
 
-This application is ready to be deployed on Railway.
+This application is ready to be deployed on Render with both frontend and backend as separate services.
 
 ### Backend Deployment
 
-1. Connect your GitHub repository to Railway.
-2. Create a new service from the repo and set the Root Directory to `backend/`.
-3. Under Variables, add all variables from your `.env` file (e.g., `MONGO_URI` or `MONGODB_URI`, `JWT_SECRET`, `CLIENT_URL` pointing to your deployed frontend domain).
-4. Railway will automatically detect `package.json` and start the server using `npm start`.
+1. Go to [render.com](https://render.com) and sign in.
+2. Click **New +** → **Web Service**.
+3. Connect your GitHub repository (`shivam999876/Task-Flow`).
+4. Configure the service:
+   - **Name:** `taskflow-backend`
+   - **Language:** `Node`
+   - **Root Directory:** `backend`
+   - **Build Command:** `npm install`
+   - **Start Command:** `npm start`
+5. Under **Environment**, add all variables:
+   ```
+   PORT=5000
+   NODE_ENV=production
+   MONGO_URI=mongodb+srv://<username>:<password>@cluster.mongodb.net/taskflow?retryWrites=true&w=majority
+   JWT_SECRET=<your_jwt_secret>
+   JWT_REFRESH_SECRET=<your_refresh_secret>
+   JWT_EXPIRES_IN=15m
+   JWT_REFRESH_EXPIRES_IN=7d
+   EMAIL_HOST=smtp.gmail.com
+   EMAIL_PORT=587
+   EMAIL_USER=<your_email>
+   EMAIL_PASS=<your_app_password>
+   EMAIL_FROM=noreply@taskflow.app
+   ALLOWED_ORIGINS=https://<your-frontend-render-domain>
+   ```
+6. Click **Create Web Service** and wait for deployment.
+7. Copy the backend URL (e.g., `https://taskflow-backend-xyz.onrender.com`).
 
 ### Frontend Deployment
 
-1. Create another service from the same repo and set the Root Directory to `frontend/`.
-2. Add `VITE_API_URL` pointing to your deployed Railway backend URL (e.g., `https://your-backend-url.up.railway.app/api`).
-3. Railway will build the Vite app and serve the static files.
+1. Click **New +** → **Web Service**.
+2. Connect the same GitHub repository.
+3. Configure the service:
+   - **Name:** `taskflow-frontend`
+   - **Language:** `Node`
+   - **Root Directory:** `frontend`
+   - **Build Command:** `npm install && npm run build`
+   - **Start Command:** `npm start`
+4. Under **Environment**, add:
+   ```
+   VITE_API_URL=https://<your-backend-render-domain>/api
+   ```
+   > Replace `<your-backend-render-domain>` with the backend URL from Step 7 above.
+5. Click **Create Web Service** and wait for deployment.
+6. Copy the frontend URL (e.g., `https://taskflow-frontend-xyz.onrender.com`).
+
+### Post-Deployment Configuration
+
+After the frontend is deployed, update the backend service:
+
+1. Go to **taskflow-backend** → **Environment**.
+2. Edit `ALLOWED_ORIGINS` to match your frontend domain:
+   ```
+   ALLOWED_ORIGINS=https://<your-frontend-render-domain>
+   ```
+3. Save and Render will automatically redeploy the backend.
+
+Your application is now live! Visit the frontend URL to access TaskFlow.
 
 ---
 
