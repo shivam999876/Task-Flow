@@ -1,4 +1,4 @@
-const jwt = require('jsonwebtoken');
+const jwt = require("jsonwebtoken");
 
 /**
  * Generates a short-lived JWT access token (default: 15m).
@@ -6,7 +6,7 @@ const jwt = require('jsonwebtoken');
  */
 const generateAccessToken = (id) =>
   jwt.sign({ id }, process.env.JWT_SECRET, {
-    expiresIn: process.env.JWT_EXPIRES_IN || '15m',
+    expiresIn: process.env.JWT_EXPIRES_IN || "15m",
   });
 
 /**
@@ -15,7 +15,7 @@ const generateAccessToken = (id) =>
  */
 const generateRefreshToken = (id) =>
   jwt.sign({ id }, process.env.JWT_REFRESH_SECRET, {
-    expiresIn: process.env.JWT_REFRESH_EXPIRES_IN || '7d',
+    expiresIn: process.env.JWT_REFRESH_EXPIRES_IN || "7d",
   });
 
 /**
@@ -32,13 +32,14 @@ const sendTokenResponse = (user, statusCode, res) => {
 
   // Cookie options
   const cookieOptions = {
-    httpOnly: true,   // Prevents JS access (XSS protection)
-    secure: process.env.NODE_ENV === 'production', // HTTPS only in prod
-    sameSite: 'lax',
+    httpOnly: true, // Prevents JS access (XSS protection)
+    secure: process.env.NODE_ENV === "production", // HTTPS only in prod
+    sameSite: process.env.NODE_ENV === "production" ? "none" : "lax",
+    path: "/",
     maxAge: 7 * 24 * 60 * 60 * 1000, // 7 days in ms
   };
 
-  res.cookie('refreshToken', refreshToken, cookieOptions);
+  res.cookie("refreshToken", refreshToken, cookieOptions);
 
   res.status(statusCode).json({
     success: true,
@@ -54,4 +55,8 @@ const sendTokenResponse = (user, statusCode, res) => {
   });
 };
 
-module.exports = { generateAccessToken, generateRefreshToken, sendTokenResponse };
+module.exports = {
+  generateAccessToken,
+  generateRefreshToken,
+  sendTokenResponse,
+};
